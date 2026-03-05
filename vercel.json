@@ -1,0 +1,7 @@
+{
+  "buildCommand": "node scripts/set-env.mjs && ng build",
+  "outputDirectory": "dist/globe/browser",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

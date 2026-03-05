@@ -1,0 +1,82 @@
+<div class="dashboard-shell">
+  <!-- Header -->
+  <header class="dash-header mat-elevation-z2">
+    <div class="header-left">
+      <span class="globe-icon">🌍</span>
+      <span class="app-name">Globe</span>
+    </div>
+    <div class="header-right">
+      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+        @if (authService.firebaseUser()?.photoURL) {
+          <img class="user-avatar" [src]="authService.firebaseUser()!.photoURL!" [alt]="authService.firebaseUser()!.displayName!" />
+        } @else {
+          <mat-icon>account_circle</mat-icon>
+        }
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-menu-header">
+          <strong>{{ authService.firebaseUser()?.displayName }}</strong>
+          <small>{{ authService.firebaseUser()?.email }}</small>
+        </div>
+        <mat-divider />
+        <button mat-menu-item (click)="authService.signOut()">
+          <mat-icon>logout</mat-icon> Sign out
+        </button>
+      </mat-menu>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="dash-main">
+    <div class="dash-title-row">
+      <h2>My Boards</h2>
+      <button mat-flat-button color="primary" (click)="openCreate()">
+        <mat-icon>add</mat-icon> New Board
+      </button>
+    </div>
+
+    @if (loading) {
+      <div class="loading-row">
+        <mat-spinner diameter="36" />
+      </div>
+    }
+
+    @if (!loading && (boards$ | async)?.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">🗺️</span>
+        <h3>No boards yet</h3>
+        <p>Create your first travel board to get started</p>
+        <button mat-flat-button color="primary" (click)="openCreate()">Create Board</button>
+      </div>
+    }
+
+    <div class="board-grid">
+      @for (board of (boards$ | async) ?? []; track board.id) {
+        <mat-card class="board-card" (click)="openBoard(board.id)" [class.owned]="board.ownerId === authService.getCurrentUid()">
+          <div class="board-emoji">{{ board.emoji ?? '🌍' }}</div>
+          <mat-card-content>
+            <h3 class="board-name">{{ board.name }}</h3>
+            <p class="board-meta">
+              {{ board.collaborators.length + 1 }} member{{ board.collaborators.length === 0 ? '' : 's' }}
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-icon-button [matMenuTriggerFor]="cardMenu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #cardMenu="matMenu">
+              <button mat-menu-item (click)="startRename(board)">
+                <mat-icon>edit</mat-icon> Rename
+              </button>
+              @if (board.ownerId === authService.getCurrentUid()) {
+                <button mat-menu-item class="danger-item" (click)="confirmDelete(board)">
+                  <mat-icon color="warn">delete</mat-icon> Delete
+                </button>
+              }
+            </mat-menu>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  </main>
+</div>

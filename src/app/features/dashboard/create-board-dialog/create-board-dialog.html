@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>New Board</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="createForm" (ngSubmit)="submit()">
+    <div class="emoji-row">
+      @for (e of emojis; track e) {
+        <button type="button" mat-icon-button class="emoji-btn" [class.selected]="form.value.emoji === e" (click)="form.patchValue({ emoji: e })">
+          {{ e }}
+        </button>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Board name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Japan 2026" cdkFocusInitial />
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" form="createForm" type="submit" [disabled]="form.invalid">
+    Create
+  </button>
+</mat-dialog-actions>

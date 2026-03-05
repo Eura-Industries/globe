@@ -1,0 +1,73 @@
+<div class="routes-card">
+  <div class="card-header">
+    <mat-icon class="header-icon">route</mat-icon>
+    <input
+      class="title-input no-panzoom"
+      [value]="thing.data.title"
+      (change)="updateTitle($any($event.target).value)"
+      placeholder="Route name…"
+    />
+    @if (thing.data.totalDistance) {
+      <span class="route-summary">{{ thing.data.totalDistance }} · {{ thing.data.totalDuration }}</span>
+    }
+  </div>
+
+  <!-- Travel mode selector -->
+  <div class="mode-bar no-panzoom">
+    @for (mode of travelModes; track mode.value) {
+      <button
+        mat-icon-button
+        [class.active]="thing.data.travelMode === mode.value"
+        [matTooltip]="mode.label"
+        (click)="setTravelMode(mode.value)"
+      >
+        <mat-icon>{{ mode.icon }}</mat-icon>
+      </button>
+    }
+  </div>
+
+  <!-- Waypoint list -->
+  <div class="waypoints no-panzoom">
+    @for (wp of thing.data.waypoints; track trackByIndex($index); let i = $index) {
+      <div class="waypoint-row">
+        <span class="stop-num">{{ i + 1 }}</span>
+        <div class="waypoint-search-wrap">
+          <input
+            type="text"
+            class="waypoint-input"
+            [value]="inputValues[i]"
+            (input)="onWaypointInput(i, $any($event.target).value)"
+            (blur)="dismissSearch()"
+            [placeholder]="i === 0 ? 'Start location…' : i === thing.data.waypoints.length - 1 ? 'End location…' : 'Stop ' + (i + 1) + '…'"
+            autocomplete="off"
+          />
+          @if (activeSearchIdx === i && searchResults.length) {
+            <ul class="search-dropdown">
+              @for (r of searchResults; track r.place_id) {
+                <li (mousedown)="selectWaypointResult(r)">{{ r.display_name }}</li>
+              }
+            </ul>
+          }
+        </div>
+        @if (thing.data.waypoints.length > 2) {
+          <button mat-icon-button class="remove-btn" (click)="removeWaypoint(i)" matTooltip="Remove stop">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+    }
+    <button mat-button class="add-stop-btn" (click)="addWaypoint()">
+      <mat-icon>add</mat-icon> Add stop
+    </button>
+  </div>
+
+  <!-- Map -->
+  @if (hasRoute) {
+    <div #mapEl class="route-map no-panzoom"></div>
+  } @else {
+    <div class="empty-map">
+      <mat-icon>map</mat-icon>
+      <p>Add at least 2 stops to see the route</p>
+    </div>
+  }
+</div>

@@ -1,0 +1,74 @@
+.panel {
+  padding: 12px;
+  min-width: 240px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.collab-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  &:last-child { border-bottom: none; }
+}
+
+.collab-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.collab-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.collab-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  .collab-name { font-size: 13px; font-weight: 500; }
+  .collab-role { font-size: 11px; color: #888; text-transform: capitalize; }
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #43A047;
+  flex-shrink: 0;
+}
+
+.pending-section {
+  margin-top: 12px;
+  small { color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+}
+
+.pending-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+  color: #555;
+  .pending-icon { font-size: 16px; color: #aaa; }
+}

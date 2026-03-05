@@ -1,0 +1,55 @@
+<div class="money-card">
+  <div class="money-header">
+    <span class="money-emoji">💰</span>
+    <div class="header-info">
+      <span class="card-title">{{ thing.data.title || 'Travel Budget' }}</span>
+      <span class="currency-badge">{{ thing.data.currency }}</span>
+    </div>
+    <span class="total-amount">{{ total | currency:thing.data.currency:'symbol':'1.0-0' }}</span>
+  </div>
+
+  <div class="items-list no-panzoom">
+    @for (item of thing.data.items; track trackById($index, item)) {
+      <div class="money-row" [class.paid]="item.paid">
+        <mat-icon class="cat-icon">{{ categoryIcon(item.category) }}</mat-icon>
+        <input class="label-input" [value]="item.label" placeholder="Label"
+          (change)="updateItem(item.id, 'label', $any($event.target).value)" />
+        <select class="cat-select"
+          [value]="item.category"
+          (change)="updateItem(item.id, 'category', $any($event.target).value)">
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat | titlecase }}</option>
+          }
+        </select>
+        <input class="amount-input" type="number" [value]="item.amount" placeholder="0"
+          (change)="updateItem(item.id, 'amount', +$any($event.target).value)" />
+        <button mat-icon-button class="paid-btn" [class.paid-active]="item.paid"
+          (click)="updateItem(item.id, 'paid', !item.paid)">
+          <mat-icon>{{ item.paid ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+        </button>
+        <button mat-icon-button class="remove-btn" (click)="removeItem(item.id)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+
+    <button mat-button class="add-item-btn" (click)="addItem()">
+      <mat-icon>add</mat-icon> Add Item
+    </button>
+  </div>
+
+  <div class="money-footer">
+    <div class="footer-row">
+      <span>Total</span>
+      <strong>{{ total | currency:thing.data.currency }}</strong>
+    </div>
+    <div class="footer-row paid-row">
+      <span>Paid</span>
+      <span class="paid-amount">{{ paidTotal | currency:thing.data.currency }}</span>
+    </div>
+    <div class="footer-row">
+      <span>Remaining</span>
+      <strong class="remaining">{{ (total - paidTotal) | currency:thing.data.currency }}</strong>
+    </div>
+  </div>
+</div>

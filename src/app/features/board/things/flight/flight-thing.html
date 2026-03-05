@@ -1,0 +1,105 @@
+<div class="flight-card">
+  <div class="card-header">
+    <span class="airline-emoji">✈️</span>
+    <div class="header-info">
+      <span class="flight-number">{{ thing.data.flightNumber || 'Flight' }}</span>
+      <span class="airline">{{ thing.data.airline }}</span>
+    </div>
+    <button mat-icon-button class="no-panzoom" (click)="startEdit()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  @if (!editing) {
+    <!-- Display mode -->
+    <div class="route-row">
+      <div class="endpoint">
+        <span class="iata">{{ thing.data.from.iata || '---' }}</span>
+        <span class="city">{{ thing.data.from.city }}</span>
+        <span class="time">{{ thing.data.from.dateTime | date:'HH:mm' }}</span>
+      </div>
+      <div class="flight-line">
+        <div class="line"></div>
+        <span class="duration">{{ thing.data.duration }}</span>
+        <mat-icon class="plane-icon">flight</mat-icon>
+      </div>
+      <div class="endpoint right">
+        <span class="iata">{{ thing.data.to.iata || '---' }}</span>
+        <span class="city">{{ thing.data.to.city }}</span>
+        <span class="time">{{ thing.data.to.dateTime | date:'HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <span class="cabin">{{ thing.data.cabinClass | titlecase }}</span>
+      @if (thing.data.price) {
+        <span class="price">{{ thing.data.price | currency:thing.data.currency }}</span>
+      }
+      @if (thing.data.bookingRef) {
+        <span class="booking-ref">Ref: {{ thing.data.bookingRef }}</span>
+      }
+    </div>
+  } @else {
+    <!-- Edit mode -->
+    <div class="edit-form no-panzoom">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Flight No.</mat-label>
+          <input matInput [(ngModel)]="draft.flightNumber" placeholder="AA123" />
+        </mat-form-field>
+        <button mat-stroked-button (click)="lookupFlight()" [disabled]="lookingUp">
+          @if (lookingUp) { <mat-spinner diameter="16" /> } @else { Lookup }
+        </button>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Airline</mat-label>
+          <input matInput [(ngModel)]="draft.airline" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Class</mat-label>
+          <mat-select [(ngModel)]="draft.cabinClass">
+            <mat-option value="economy">Economy</mat-option>
+            <mat-option value="premium_economy">Premium Economy</mat-option>
+            <mat-option value="business">Business</mat-option>
+            <mat-option value="first">First</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>From (IATA)</mat-label>
+          <input matInput [(ngModel)]="draft.from!.iata" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Departs</mat-label>
+          <input matInput type="datetime-local" [(ngModel)]="draft.from!.dateTime" />
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>To (IATA)</mat-label>
+          <input matInput [(ngModel)]="draft.to!.iata" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Arrives</mat-label>
+          <input matInput type="datetime-local" [(ngModel)]="draft.to!.dateTime" />
+        </mat-form-field>
+      </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Price</mat-label>
+          <input matInput type="number" [(ngModel)]="draft.price" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="flex1">
+          <mat-label>Booking Ref</mat-label>
+          <input matInput [(ngModel)]="draft.bookingRef" />
+        </mat-form-field>
+      </div>
+      <div class="form-actions">
+        <button mat-button (click)="cancelEdit()">Cancel</button>
+        <button mat-flat-button color="primary" (click)="saveEdit()">Save</button>
+      </div>
+    </div>
+  }
+</div>

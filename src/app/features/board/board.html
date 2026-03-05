@@ -1,0 +1,136 @@
+<div class="board-page" #boardEl>
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="48" />
+    </div>
+  }
+
+  @if (board(); as b) {
+    <!-- Top header bar -->
+    <header class="board-header no-panzoom">
+      <button mat-icon-button (click)="goToDashboard()" matTooltip="Back to dashboard">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span class="board-emoji">{{ b.emoji }}</span>
+      <h1 class="board-name">{{ b.name }}</h1>
+
+      <div class="header-spacer"></div>
+
+      <button mat-stroked-button class="invite-btn" (click)="openInviteDialog()">
+        <mat-icon>person_add</mat-icon> Invite
+      </button>
+      <button mat-icon-button (click)="showCollaborators.set(!showCollaborators())" matTooltip="Collaborators">
+        <mat-icon>group</mat-icon>
+      </button>
+    </header>
+
+    <!-- Left toolbar -->
+    <app-board-toolbar
+      class="board-toolbar no-panzoom"
+      [canUndo]="canUndo()"
+      [canRedo]="canRedo()"
+      (add)="onAddThing($event)"
+      (undo)="undo()"
+      (redo)="redo()"
+      (background)="onBackgroundChange($event)"
+    />
+
+    <!-- Collaborators panel -->
+    @if (showCollaborators()) {
+      <app-collaborators-panel
+        class="collabs-panel no-panzoom"
+        [board]="board()"
+        [isOwner]="board()?.ownerId === auth.getCurrentUid()"
+        [onlineUids]="onlineUidSet()"
+        (invite)="openInviteDialog()"
+        (remove)="onRemoveCollaborator($event)"
+      />
+    }
+
+    <!-- Canvas -->
+    <app-canvas
+      class="canvas-area"
+      [board]="b"
+      (canvasClick)="onCanvasClick($event)"
+      (cursorMove)="onCursorMove($event)"
+    >
+      <!-- Render all Things inside the panzoom layer -->
+      @for (thing of things(); track thing.id) {
+        <div
+          thingContainer
+          [thing]="thing"
+          [selected]="isSelected(thing)"
+          (moved)="onThingMoved($event)"
+          (resized)="onThingResized($event)"
+          (selected$)="onThingSelected($event)"
+          (contextMenu$)="onContextMenu($event)"
+        >
+          @switch (thing.type) {
+            @case ('text') {
+              <app-text-thing
+                [thing]="asText(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('label') {
+              <app-label-thing
+                [thing]="asLabel(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('shape') {
+              <app-shape-thing
+                [thing]="asShape(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('file') {
+              <app-file-thing
+                [thing]="asFile(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('flight') {
+              <app-flight-thing
+                [thing]="asFlight(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('place') {
+              <app-place-thing
+                [thing]="asPlace(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('routes') {
+              <app-routes-thing
+                [thing]="asRoutes(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+            @case ('money') {
+              <app-money-thing
+                [thing]="asMoney(thing)"
+                (dataChanged)="onThingDataChanged(thing, $event)"
+              />
+            }
+          }
+        </div>
+      }
+
+      <!-- Cursor overlay (sibling inside canvas) -->
+      <app-cursor-overlay [cursors]="remoteCursors()" />
+    </app-canvas>
+
+    <!-- Context menu (portal-rendered at mouse position) -->
+    @if (ctxMenuThing()) {
+      <app-thing-context-menu
+        class="no-panzoom"
+        [thing]="ctxMenuThing()"
+        [x]="ctxMenuX()"
+        [y]="ctxMenuY()"
+        (action)="onContextAction($event)"
+      />
+    }
+  }
+</div>

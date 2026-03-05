@@ -1,0 +1,50 @@
+<div class="place-card">
+  <div class="card-header">
+    <span class="place-emoji">📍</span>
+    <div class="header-info">
+      <span class="place-name">{{ thing.data.name || 'Place' }}</span>
+    </div>
+    <button mat-icon-button class="no-panzoom" (click)="startSearch()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+
+  @if (searching) {
+    <div class="search-zone no-panzoom">
+      <input
+        type="text"
+        [value]="searchQuery"
+        (input)="onSearchInput($any($event.target).value)"
+        placeholder="Search for a place, city, or country…"
+        class="place-search-input"
+        autocomplete="off"
+        autofocus
+      />
+      @if (searchResults.length) {
+        <ul class="search-results">
+          @for (r of searchResults; track r.place_id) {
+            <li (mousedown)="selectResult(r)">{{ r.display_name }}</li>
+          }
+        </ul>
+      }
+      <button mat-button (click)="cancelSearch()">Cancel</button>
+    </div>
+  }
+
+  @if (thing.data.lat && !searching) {
+    <div #mapEl class="place-map no-panzoom"></div>
+  }
+
+  @if (thing.data.address && !searching) {
+    <div class="place-info">
+      <p class="address"><mat-icon class="info-icon">location_on</mat-icon> {{ thing.data.address }}</p>
+    </div>
+  }
+
+  @if (!thing.data.placeId && !searching) {
+    <div class="empty-place no-panzoom" (click)="startSearch()">
+      <mat-icon>add_location</mat-icon>
+      <p>Click to add a place</p>
+    </div>
+  }
+</div>
